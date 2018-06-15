@@ -1,0 +1,18 @@
+<view scroll-y class='container'>
+  <image class='movie-image' src="/images/p2517753454.jpg" mode='widthFix'></image>
+  <view class='movie-title'>复仇者联盟3：无限战争</view>
+  <view class='content-wrapper'>
+    <open-data class="user-avatar" type="userAvatarUrl"></open-data>
+    <view class='content-text'>徐妍给你推荐了一部电影</view>
+  </view>
+</view>
+<view class="button-wrapper">
+  <navigator class='button-with-icon' url="/pages/movie-detail/movie-detail">
+    <image src="/images/hot.png"></image>
+    <text>热门</text>
+  </navigator>
+  <navigator class='button-with-icon' url="/pages/user/user">
+    <image src="/images/me.png"></image>
+    <text>我的</text>
+  </navigator>
+</view>
