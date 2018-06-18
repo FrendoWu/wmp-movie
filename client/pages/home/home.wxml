@@ -7,7 +7,7 @@
   </view>
 </view>
 <view class="button-wrapper">
-  <navigator class='button-with-icon' url="/pages/movie-detail/movie-detail">
+  <navigator class='button-with-icon' url="/pages/movie-list/movie-list">
     <image src="/images/hot.png"></image>
     <text>热门</text>
   </navigator>

@@ -1,11 +1,14 @@
 // pages/movie-list/movie-list.js
+const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
+const config = require('../../config.js');
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-  
+    movies: []
   },
 
   /**
@@ -26,41 +29,50 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-  
+    this.getMovieList();
   },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-  
+  onPullDownRefresh: function() {
+    this.getMovieList(() => {
+      wx.stopPullDownRefresh();
+    })
   },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-  
+  goToDetail(event) {
+    let movieId = event.currentTarget.dataset.id;
+    console.log(movieId)
+    wx.navigateTo({
+      url: '/pages/movie-detail/movie-detail?id=' + movieId,
+    })
   },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-  
+  getMovieList(cb) {
+    wx.showLoading({
+      title: '电影列表加载中'
+    })
+    qcloud.request({
+      url: config.service.movieList,
+      success: result => {
+        console.log(result)
+        if (!result.data.code && result.data.data !== {}) {
+          this.setData({
+            movies: result.data.data
+          });
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '电影列表加载失败'
+          })
+        }
+      },
+      fail: err => {
+        console.log(err);
+        wx.showToast({
+          icon: 'none',
+          title: '电影列表加载失败'
+        })
+      },
+      complete: result => {
+        wx.hideLoading();
+        cb && cb()
+      }
+    });
   },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-  
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-  
-  }
 })

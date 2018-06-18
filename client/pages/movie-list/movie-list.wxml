@@ -1,2 +1,13 @@
-<!--pages/movie-list/movie-list.wxml-->
-<text>pages/movie-list/movie-list.wxml</text>
+<view class="container" wx:if="{{movies.length > 0}}">
+  <view wx:for="{{movies}}" wx:for-item="movie" wx:key="{{movie.id}}" class='movie-container' bindtap='goToDetail' data-id="{{movie.id}}">
+    <image src='{{movie.image}}' class='movie-image'></image>
+    <view class='movie-description'>
+      <view class='movie-title'>{{movie.title}}</view>
+      <view class='movie-category'>{{movie.category}}</view>
+    </view>
+  </view>
+</view>
+<view class="movie-empty movie-container" wx:else>
+  <image class="empty-image" src="/images/hot-disable.png"></image>
+  <view class="empty-text">暂时还没有热门电影</view>
+</view>

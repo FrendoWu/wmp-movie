@@ -6,5 +6,31 @@
 	},
 	"appid": "wxfe0a21bc2795bf45",
 	"projectname": "kan-movie",
-	"condition": {}
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"miniprogram": {
+			"current": 0,
+			"list": [
+				{
+					"id": -1,
+					"name": "movie-list",
+					"pathName": "pages/movie-list/movie-list"
+				}
+			]
+		}
+	}
 }
