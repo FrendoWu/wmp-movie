@@ -1,4 +1,3 @@
-// pages/movie-list/movie-list.js
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
 

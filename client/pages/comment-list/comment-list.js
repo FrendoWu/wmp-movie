@@ -1,66 +1,60 @@
-// pages/comment-list/comment-list.js
+const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
+const config = require('../../config.js');
+const util = require('../../utils/util.js');
+const app = getApp();
+
 Page({
 
-  /**
-   * 页面的初始数据
-   */
   data: {
-  
+    comments: []
   },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
-  
+    let movieId = options.movieId;
+    this.getComments(movieId);
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-  
+  goToHome() {
+    wx.navigateTo({
+      url: '/pages/home/home'
+    })
   },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-  
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-  
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-  
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-  
+  getComments(movieId){
+    wx.showLoading({
+      title: '正在获取影评列表'
+    })
+    qcloud.request({
+      url: config.service.commentList + `?movieId=${movieId}`,
+      data: {
+        movieId: movieId
+      },
+      method: 'GET',
+      success: result => {
+        wx.hideLoading();
+        if (!result.data.code) {
+          let comments = result.data.data;
+          comments.forEach(comment => {
+            comment.create_time = util.formatTime(new Date(comment.create_time))
+          })
+          this.setData({
+            comments: result.data.data
+          })
+          wx.showToast({
+            title: '获取影评成功'
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '获取影评失败'
+          })
+        }
+      },
+      fail: result => {
+        console.log(result);
+        wx.hideLoading();
+        wx.showToast({
+          icon: 'none',
+          title: '获取影评失败'
+        })
+      }
+    })
   }
 })

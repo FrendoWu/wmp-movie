@@ -1,2 +1,13 @@
-<!--pages/comment-list/comment-list.wxml-->
-<text>pages/comment-list/comment-list.wxml</text>
+<view class="comment-list-container">
+  <view wx:for="{{comments}}" wx:for-item="comment" wx:key="comment.id" class='comment-item'>
+    <view class='comment-title'>
+      <image src='{{comment.user_avatar}}' class='user-avatar'></image>
+      <view class='comment-name-and-time'>
+        <view class='comment-user-name'>{{comment.user_name}}</view>
+        <view class='comment-create-time'>{{comment.create_time}}</view>
+      </view>
+    </view>
+    <view class='comment-content'>{{comment.content}}</view>
+  </view>
+</view>
+<button class='bottom-btn' bindtap='goToHome'>回 到 首 页</button>

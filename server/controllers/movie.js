@@ -6,6 +6,12 @@ module.exports = {
     ctx.state.data = await DB.query("Select * from movie");
   },
   detail: async ctx => {
-    ctx.state.data = await DB.query("Select * from movie");
+    
+    movieId = + ctx.params.id
+    if (!isNaN(movieId)) {
+      ctx.state.data = (await DB.query("Select * from movie where id = ?", [movieId]))[0]
+    } else {
+      ctx.state.data = {}
+    }
   }
 }

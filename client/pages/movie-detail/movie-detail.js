@@ -1,67 +1,79 @@
-// pages/movie-detail/movie-detail.js
+const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
+const config = require('../../config.js');
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-  
+    movie: null
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad: function(options) {
     let movieId = options.id;
-    console.log(options.id);
+    this.getMovie(movieId);
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-  
+  goToCommentList(event) {
+    let movieId = event.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: '/pages/comment-list/comment-list?movieId=' + movieId,
+    })
   },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-  
+  getMovie(movieId) {
+    wx.showLoading({
+      title: '电影详情加载中'
+    })
+    qcloud.request({
+      url: config.service.movieDetail + movieId,
+      success: result => {
+        console.log(result)
+        if (!result.data.code && result.data.data !== {}) {
+          this.setData({
+            movie: result.data.data
+          });
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '电影详情加载失败'
+          })
+        }
+      },
+      fail: err => {
+        console.log(err);
+        wx.showToast({
+          icon: 'none',
+          title: '电影详情加载失败'
+        })
+      },
+      complete: result => {
+        wx.hideLoading();
+      }
+    });
   },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-  
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-  
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-  
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-  
+  addComment(event) {
+    let movieId = event.currentTarget.dataset.id;
+    let commentType = '';
+    wx.showActionSheet({
+      itemList: ['文字', '音频'],
+      success: function(res) {
+        if (res.tapIndex === 0) {
+          // 文字
+          commentType = 'text'
+        } else {
+          // 音频
+          commentType = 'voice'
+        }
+        wx.navigateTo({
+          url: `/pages/comment-edit/comment-edit?movieId=${movieId}&commentType=${commentType}`
+        })
+      },
+      fail: function(res) {
+        console.log(res.errMsg)
+      }
+    })
   }
 })

@@ -28,7 +28,20 @@
 				{
 					"id": -1,
 					"name": "movie-list",
-					"pathName": "pages/movie-list/movie-list"
+					"pathName": "pages/movie-list/movie-list",
+					"query": ""
+				},
+				{
+					"id": 1,
+					"name": "comment-edit",
+					"pathName": "pages/comment-edit/comment-edit",
+					"query": "commentType=text&movieId=1"
+				},
+				{
+					"id": -1,
+					"name": "comment-list",
+					"pathName": "pages/comment-list/comment-list",
+					"query": "movieId=1"
 				}
 			]
 		}

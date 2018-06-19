@@ -1,66 +1,138 @@
-// pages/comment-edit/comment-edit.js
+const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
+const config = require('../../config.js');
+const app = getApp();
+
 Page({
 
-  /**
-   * 页面的初始数据
-   */
   data: {
-  
+    userInfo: null,
+    movie: null,
+    commentContent: "",
+    commentType: 'text',
+    editMode: true
   },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
-  
+    console.log(options)
+    let commentType = options.commentType
+    let movieId = options.movieId
+    this.setData({
+      commentType: 'text'
+    })
+    this.getMovie(movieId);
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-  
+  onTapLogin(e) {
+    console.log(e)
+    if (e.detail.userInfo) {
+      this.setData({
+        userInfo: e.detail.userInfo
+      })
+    }
   },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-  
+  onTapFinishBtn() {
+    this.setData({
+      editMode: false
+    })
+    wx.setNavigationBarTitle({
+      title: '影评预览'
+    })
   },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-  
+  onTapEditBack() {
+    this.setData({
+      editMode: true
+    })
+    wx.setNavigationBarTitle({
+      title: '编辑影评'
+    })
   },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-  
+  onInputComment(event) {
+    this.setData({
+      commentContent: event.detail.value
+    })
   },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-  
+  onShow() {
+    app.login({
+      success: (userInfo) => {
+        this.setData({ userInfo })
+        console.log(userInfo)
+      },
+      fail: () => {
+        console.log('fail')
+      }
+    })
   },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-  
+  getMovie(movieId) {
+    wx.showLoading({
+      title: '电影详情加载中'
+    })
+    qcloud.request({
+      url: config.service.movieDetail + movieId,
+      success: result => {
+        console.log('<<<>>>')
+        console.log(result)
+        if (!result.data.code && result.data.data !== {}) {
+          this.setData({
+            movie: result.data.data
+          });
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '电影详情加载失败'
+          })
+        }
+      },
+      fail: err => {
+        console.log(err);
+        wx.showToast({
+          icon: 'none',
+          title: '电影详情加载失败'
+        })
+      },
+      complete: result => {
+        wx.hideLoading();
+      }
+    });
   },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-  
+  sendComment() {
+    let movieId = this.data.movie.id;
+    let comment = this.data.commentContent;
+    let commentType = this.data.commentType;
+    wx.showLoading({
+      title: '正在发布影评'
+    })
+    qcloud.request({
+      url: config.service.addComment,
+      data: {
+        movieId: movieId,
+        content: comment,
+        commentType: commentType
+      },
+      method: 'POST',
+      success: result => {
+        wx.hideLoading();
+        if (!result.data.code) {
+          wx.showToast({
+            title: '发布影评成功'
+          })
+          setTimeout(() => {
+            wx.navigateTo({
+              url: '/pages/comment-list/comment-list?movieId=' + movieId
+            })
+          }, 1500)
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '发布影评失败'
+          })
+        }
+      },
+      fail: result => {
+        console.log(result);
+        wx.hideLoading();
+        wx.showToast({
+          icon: 'none',
+          title: '发布影评失败'
+        })
+      }
+    })
   }
 })

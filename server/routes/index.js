@@ -32,13 +32,16 @@ router.get('/message', controllers.message.get)
 // POST 用来处理微信转发过来的客服消息
 router.post('/message', controllers.message.post)
 
-// 随机获取一条评论
-router.get('/comment/one', controllers.comment.getOne)
-
 // 获取电影列表
 router.get('/movie', controllers.movie.list)
-
 // 获取电影列表
 router.get('/movie/:id', controllers.movie.detail)
+
+// 随机获取一条评论
+router.get('/comment/one', controllers.comment.getOne)
+// 提交评论
+router.post('/comment', validationMiddleware, controllers.comment.add)
+// 评论列表
+router.get('/comment', controllers.comment.list)
 
 module.exports = router

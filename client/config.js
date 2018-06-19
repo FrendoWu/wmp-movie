@@ -23,8 +23,15 @@ var config = {
         // 上传图片接口
         uploadUrl: `${host}/weapp/upload`,
 
-        // 上传图片接口
-        movieList: `${host}/weapp/movie`
+        // 获得电影列表接口
+        movieList: `${host}/weapp/movie`,
+        // 获得电影详情接口
+        movieDetail: `${host}/weapp/movie/`,
+
+        // 添加影评
+        addComment: `${host}/weapp/comment`,
+        // 获得影评列表
+        commentList: `${host}/weapp/comment`
     }
 };
 
