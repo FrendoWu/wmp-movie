@@ -67,7 +67,12 @@ Page({
       url: '/pages/home/home'
     })
   },
-  getComments(movieId){
+  onPullDownRefresh() {
+    this.getComments(this.data.movieId, () => {
+      wx.stopPullDownRefresh();
+    });
+  },
+  getComments(movieId, cb){
     wx.showLoading({
       title: '正在获取影评列表'
     })
@@ -108,6 +113,9 @@ Page({
           icon: 'none',
           title: '获取影评失败'
         })
+      },
+      complete: () => {
+        cb && cb()
       }
     })
   }

@@ -7,7 +7,9 @@ Page({
    * 页面的初始数据
    */
   data: {
-    movies: []
+    movies: [],
+    fullMovies: [],
+    searchContent: ''
   },
 
   /**
@@ -24,11 +26,24 @@ Page({
   
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow: function () {
     this.getMovieList();
+  },
+  onTapSearch(event) {
+    let searchContent = event.detail.value
+    this.setData({
+      searchContent: searchContent
+    })
+    let movies = this.data.fullMovies.slice(0)
+    this.filterMovies(movies);
+  },
+  filterMovies(movies) {
+    let searchContent = this.data.searchContent
+    console.log()
+    let searchMovies = movies.filter(m => m.title.indexOf(searchContent) >= 0 || m.category.indexOf(searchContent) >= 0)
+    this.setData({
+      movies: searchMovies
+    })
   },
   onPullDownRefresh: function() {
     this.getMovieList(() => {
@@ -50,8 +65,11 @@ Page({
       success: result => {
         console.log(result)
         if (!result.data.code && result.data.data !== {}) {
+          let movies = result.data.data;
           this.setData({
-            movies: result.data.data
+            movies: result.data.data,
+            fullMovies: movies,
+            searchContent: ''
           });
         } else {
           wx.showToast({
