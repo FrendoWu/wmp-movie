@@ -31,7 +31,16 @@ var config = {
         // 添加影评
         addComment: `${host}/weapp/comment`,
         // 获得影评列表
-        commentList: `${host}/weapp/comment`
+        commentList: `${host}/weapp/comment`,
+        // 获得影评详情
+        commentDetail: `${host}/weapp/comment/`,
+        // 获得推荐影评
+        commentRecommend: `${host}/weapp/comment/recommend`,
+
+        // 更新收藏状态
+        updateCollection: `${host}/weapp/collection`,
+        // 获取收藏影评列表
+        collectionList: `${host}/weapp/collection`
     }
 };
 

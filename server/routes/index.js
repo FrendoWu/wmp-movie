@@ -37,11 +37,18 @@ router.get('/movie', controllers.movie.list)
 // 获取电影列表
 router.get('/movie/:id', controllers.movie.detail)
 
-// 随机获取一条评论
-router.get('/comment/one', controllers.comment.getOne)
-// 提交评论
+// 随机获取一条影评
+router.get('/comment/recommend', validationMiddleware, controllers.comment.getOne)
+// 提交影评
 router.post('/comment', validationMiddleware, controllers.comment.add)
-// 评论列表
+// 影评列表
 router.get('/comment', controllers.comment.list)
+// 获得影评详情
+router.get('/comment/:id', validationMiddleware, controllers.comment.detail)
+
+// 获得用户收藏列表
+router.get('/collection', validationMiddleware, controllers.collection.list)
+// 更新用户评论收藏状态
+router.post('/collection', validationMiddleware, controllers.collection.update)
 
 module.exports = router

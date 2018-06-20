@@ -23,7 +23,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 4,
 			"list": [
 				{
 					"id": -1,
@@ -35,13 +35,25 @@
 					"id": 1,
 					"name": "comment-edit",
 					"pathName": "pages/comment-edit/comment-edit",
-					"query": "commentType=text&movieId=1"
+					"query": "commentType=voice&movieId=1"
 				},
 				{
 					"id": -1,
 					"name": "comment-list",
 					"pathName": "pages/comment-list/comment-list",
 					"query": "movieId=1"
+				},
+				{
+					"id": -1,
+					"name": "comment-detail",
+					"pathName": "pages/comment-detail/comment-detail",
+					"query": "commentId=26"
+				},
+				{
+					"id": -1,
+					"name": "user",
+					"pathName": "pages/user/user",
+					"query": ""
 				}
 			]
 		}
