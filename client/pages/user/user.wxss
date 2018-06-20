@@ -27,24 +27,20 @@
   background-color: #ffffff;
   overflow: hidden;
 }
-
 .movie-description {
   margin-left: 200rpx;
   padding: 30rpx;
 }
-
 .movie-image {
   position: absolute;
   height: 300rpx;
   width: 200rpx;
 }
-
 .movie-title {
   font-size: 35rpx;
   line-height: 49rpx;
   font-weight: bold;
 }
-
 .comment-empty {
   margin: 50rpx;
   height: 300rpx;
@@ -58,13 +54,11 @@
   justify-content: center;
   align-items: center;
 }
-
 .empty-image {
   margin: 0 auto;
   width: 100rpx;
   height: 100rpx;
 }
-
 .empty-text {
   font-size: 28rpx;
   line-height: 40rpx;

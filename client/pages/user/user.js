@@ -1,6 +1,7 @@
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
 const app = getApp();
+
 // 列表类型
 const COLLECTION = 0
 const PUBLISH = 1
@@ -9,8 +10,12 @@ Page({
   data: {
     userInfo: null,
     comments: [],
-    listType: COLLECTION
+    listType: COLLECTION //列表类型，收藏或者发布
   },
+  /**
+   * 监听页面加载事件
+   * 登录并获取列表
+   */
   onLoad: function (options) {
     app.login({
       success: (userInfo) => {
@@ -19,11 +24,29 @@ Page({
         })
         this.getList();
       },
-      fail: () => {
-        console.log('fail')
+      fail: (error) => {
       }
     })
   },
+  /**
+   * 监听页面显示事件
+   * 用户登录
+   */
+  onShow: function () {
+    app.login({
+      success: (userInfo) => {
+        this.setData({
+          userInfo: userInfo
+        })
+      },
+      fail: (error) => {
+      }
+    })
+  },
+  /**
+   * 监听列表类型点击事件
+   * 修改列表类型，重新获取列表
+   */
   onTapListType(event) {
     let listType = +event.currentTarget.dataset.type;
     this.setData({
@@ -31,11 +54,46 @@ Page({
     })
     this.getList();
   },
+  /**
+   * 监听登录按钮点击事件
+   * 获取用户授权更新userInfo
+   */
+  onTapLogin(e) {
+    if (e.detail.userInfo) {
+      this.setData({
+        userInfo: e.detail.userInfo
+      })
+    }
+  },
+  /**
+   * 跳转至首页
+   */
+  goToHome() {
+    wx.navigateTo({
+      url: '/pages/home/home'
+    })
+  },
+  /**
+   * 跳转至影评详情页
+   */
+  goToCommentDetail(event) {
+    let commentId = event.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/pages/comment-detail/comment-detail?commentId=${commentId}`,
+    })
+  },
+  /**
+   * 监听下拉刷新事件
+   * 获取列表
+   */
   onPullDownRefresh() {
     this.getList(() => {
       wx.stopPullDownRefresh();
     });
   },
+  /**
+   * 获取收藏影评列表函数
+   */
   getCollection(cb) {
     wx.showLoading({
       title: '收藏影评加载中'
@@ -43,7 +101,6 @@ Page({
     qcloud.request({
       url: config.service.collectionList,
       success: result => {
-        console.log(result)
         wx.hideLoading();
         if (!result.data.code) {
           let comments = result.data.data;
@@ -61,7 +118,6 @@ Page({
         }
       },
       fail: err => {
-        console.log(err);
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -73,6 +129,9 @@ Page({
       }
     })
   },
+  /**
+   * 获取用户发布影评列表函数
+   */
   getUserComments(cb) {
     wx.showLoading({
       title: '发布影评加载中'
@@ -80,7 +139,6 @@ Page({
     qcloud.request({
       url: config.service.userComment,
       success: result => {
-        console.log(result)
         wx.hideLoading();
         if (!result.data.code) {
           let comments = result.data.data;
@@ -98,7 +156,6 @@ Page({
         }
       },
       fail: err => {
-        console.log(err);
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -110,42 +167,14 @@ Page({
       }
     })
   },
+  /**
+   * 根据列表类型调用不同函数获取列表
+   */
   getList(cb){
     if (this.data.listType === COLLECTION) {
       this.getCollection(cb);
     } else if (this.data.listType === PUBLISH){
       this.getUserComments(cb);
     }
-  },
-  onTapLogin(e) {
-    console.log(e)
-    if (e.detail.userInfo) {
-      this.setData({
-        userInfo: e.detail.userInfo
-      })
-    }
-  },
-  goToHome() {
-    wx.navigateTo({
-      url: '/pages/home/home'
-    })
-  },
-  goToCommentDetail(event) {
-    let commentId = event.currentTarget.dataset.id;
-    wx.navigateTo({
-      url: `/pages/comment-detail/comment-detail?commentId=${commentId}`,
-    })
-  },
-  onShow: function () {
-    app.login({
-      success: (userInfo) => {
-        this.setData({
-          userInfo: userInfo
-        })
-      },
-      fail: () => {
-        console.log('fail')
-      }
-    })
   }
 })

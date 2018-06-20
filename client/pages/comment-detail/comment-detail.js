@@ -12,10 +12,6 @@ const UNSTAR = 0
 const STARED = 1
 
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
     comment: null,
     audioStatus: UNPLAYING,
@@ -35,8 +31,7 @@ Page({
         this.setAudioOptions()
 
       },
-      fail: () => {
-        console.log('fail')
+      fail: (error) => {
       }
     })
   },
@@ -77,8 +72,6 @@ Page({
         }
       },
       fail: result => {
-
-        console.log('1234',result);
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -94,7 +87,6 @@ Page({
     })
   },
   onTapLogin(e) {
-    console.log(e)
     if (e.detail.userInfo) {
       this.setData({
         userInfo: e.detail.userInfo
@@ -119,7 +111,6 @@ Page({
         })
       },
       fail: function (res) {
-        console.log(res.errMsg)
       }
     })
   },
@@ -145,7 +136,6 @@ Page({
       })
     })
     innerAudioContext.onError((res) => {
-      console.log(res)
     })
   },
   getCommentDetail(commentId) {
@@ -155,7 +145,6 @@ Page({
       success: result => {
         if (!result.data.code) {
           let comment = result.data.data;
-          console.log(comment)
           comment.createTime = util.formatTime(new Date(comment.createTime))
           comment['durationText'] = Math.floor(comment.duration / 1000 * 100) / 100 + "''"
           this.setData({
@@ -170,7 +159,6 @@ Page({
         }
       },
       fail: result => {
-        console.log(result);
         wx.showToast({
           icon: 'none',
           title: '获取影评失败'

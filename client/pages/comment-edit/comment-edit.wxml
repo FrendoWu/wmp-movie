@@ -32,10 +32,13 @@
           <image src="{{audioStatus === 0? '/images/play.png' : '/images/stop.png'}}" class='audio-image'></image>
           <view class='audio-duration'>{{recordAudio.durationText}}</view>
         </view>
-        <view wx:if="{{editMode}}" class="record-container {{recordStatus === 0 || recordStatus === 2?'':'recording'}}" bindtouchstart='startRecord' bindtouchend='endRecord'>
+        <view wx:if="{{editMode && (recordAuthStatus === 0 || recordAuthStatus === 2)}}" class="record-container {{recordStatus === 0 || recordStatus === 2?'':'recording'}}" bindtouchstart='startRecord' bindtouchend='endRecord'>
           <image src='/images/record.png' class='record-icon'></image>
           <view class='record-text'>{{recordStatusTip[recordStatus]}}</view>
         </view>
+        <button open-type="openSetting" bindopensetting="settingCallBack" wx:if="{{editMode && recordAuthStatus === 1}}" class="record-container">
+          <view class='record-text'>授权录音</view>
+        </button>
       </view>
 
       <view class='btn-container' wx:if="{{!editMode}}">

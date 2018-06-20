@@ -2,33 +2,21 @@ const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
 
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-    movies: [],
-    fullMovies: [],
-    searchContent: ''
+    movies: [], // 于前台电影列表绑定的数据
+    fullMovies: [], // 从后台获取的完整电影列表，用于每次前台过滤
+    searchContent: '' // 搜索框文字
   },
-
   /**
-   * 生命周期函数--监听页面加载
+   * 生命周期函数--监听页面显示
    */
-  onLoad: function (options) {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-  
-  },
-
   onShow: function () {
     this.getMovieList();
   },
+  /**
+   * 监听搜索框输入事件
+   * 前台过滤电影列表
+   */
   onTapSearch(event) {
     let searchContent = event.detail.value
     this.setData({
@@ -37,25 +25,38 @@ Page({
     let movies = this.data.fullMovies.slice(0)
     this.filterMovies(movies);
   },
-  filterMovies(movies) {
-    let searchContent = this.data.searchContent
-    console.log()
-    let searchMovies = movies.filter(m => m.title.indexOf(searchContent) >= 0 || m.category.indexOf(searchContent) >= 0)
-    this.setData({
-      movies: searchMovies
-    })
-  },
-  onPullDownRefresh: function() {
+  /**
+   * 监听下拉刷新事件
+   * 获取电影列表
+   */
+  onPullDownRefresh: function () {
     this.getMovieList(() => {
       wx.stopPullDownRefresh();
     })
   },
+  /**
+   * 跳转至电影详情
+   */
   goToDetail(event) {
     let movieId = event.currentTarget.dataset.id;
     wx.navigateTo({
       url: '/pages/movie-detail/movie-detail?id=' + movieId,
     })
   },
+  /**
+   * 过滤电影列表函数
+   * 支持电影名称或者电影标签搜索
+   */
+  filterMovies(movies) {
+    let searchContent = this.data.searchContent
+    let searchMovies = movies.filter(m => m.title.indexOf(searchContent) >= 0 || m.category.indexOf(searchContent) >= 0)
+    this.setData({
+      movies: searchMovies
+    })
+  },
+  /**
+   * 获取电影列表函数，并重置搜索框条件
+   */
   getMovieList(cb) {
     wx.showLoading({
       title: '电影列表加载中'
@@ -63,7 +64,6 @@ Page({
     qcloud.request({
       url: config.service.movieList,
       success: result => {
-        console.log(result)
         if (!result.data.code && result.data.data !== {}) {
           let movies = result.data.data;
           this.setData({
@@ -79,7 +79,6 @@ Page({
         }
       },
       fail: err => {
-        console.log(err);
         wx.showToast({
           icon: 'none',
           title: '电影列表加载失败'

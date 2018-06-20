@@ -1,20 +1,15 @@
-// pages/home/home.js
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
 const app = getApp();
 
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
     userInfo: null,
     comment: null
   },
-
   /**
-   * 生命周期函数--监听页面加载
+   * 监听加载事件
+   * 登录并获取推荐的影评
    */
   onLoad: function (options) {
     app.login({
@@ -24,28 +19,67 @@ Page({
         })
         this.getRecommendComment();
       },
-      fail: () => {
-        console.log('fail')
+      fail: (error) => {
       }
     })
   },
+  /**
+   * 监听点击登录按钮事件
+   * 获取用户授权并获取推荐的影评
+   */
+  onTapLogin(e) {
+    if (e.detail.userInfo) {
+      this.setData({
+        userInfo: e.detail.userInfo
+      })
+      this.getRecommendComment();
+    }
+  },
+  /**
+   * 监听页面显示事件
+   * 登录用户
+   */
+  onShow: function () {
+    app.login({
+      success: (userInfo) => {
+        this.setData({
+          userInfo: userInfo
+        })
+      },
+      fail: (error) => {
+      }
+    })
+  },
+  /**
+   * 监听下拉刷新事件
+   * 重新获取推荐的影评
+   */
   onPullDownRefresh() {
     this.getRecommendComment(() => {
       wx.stopPullDownRefresh();
     });
   },
+  /**
+   * 跳转至影评详情页
+   */
   goToCommentDetail() {
     let commentId = this.data.comment.commentId;
     wx.navigateTo({
       url: `/pages/comment-detail/comment-detail?commentId=${commentId}`,
     })
   },
+  /**
+   * 跳转至电影详情页
+   */
   goToMovieDetail() {
     let movieId = this.data.comment.movieId;
     wx.navigateTo({
       url: '/pages/movie-detail/movie-detail?id=' + movieId,
     })
   },
+  /**
+   * 获取推荐的影评
+   */
   getRecommendComment(cb) {
     wx.showLoading({
       title: '电影加载中'
@@ -53,7 +87,6 @@ Page({
     qcloud.request({
       url: config.service.commentRecommend,
       success: result => {
-        console.log(result)
         wx.hideLoading();
         if (!result.data.code) {
           wx.showToast({
@@ -71,7 +104,6 @@ Page({
         }
       },
       fail: err => {
-        console.log(err);
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -80,27 +112,6 @@ Page({
       },
       complete: result => {
         cb && cb()
-      }
-    })
-  },
-  onTapLogin(e) {
-    console.log(e)
-    if (e.detail.userInfo) {
-      this.setData({
-        userInfo: e.detail.userInfo
-      })
-      this.getRecommendComment();
-    }
-  },
-  onShow: function () {
-    app.login({
-      success: (userInfo) => {
-        this.setData({
-          userInfo: userInfo
-        })
-      },
-      fail: () => {
-        console.log('fail')
       }
     })
   }

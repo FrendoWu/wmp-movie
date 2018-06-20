@@ -8,7 +8,10 @@ App({
   onLaunch: function () {
     qcloud.setLoginUrl(config.service.loginUrl);
   },
-
+  /**
+   * 用户登录
+   * 因为qcloud.login中会执行wx.checkSession()操作，故不需要先执行wx.checkSession()
+   */
   login({ success, fail, complete }) {
     if (userInfo) {
       return success && success(userInfo);
@@ -31,17 +34,17 @@ App({
       }
     })
   },
-
+  /**
+   * 获取用户信息
+   */
   getUserInfo({ success, fail, complete }) {
     qcloud.request({
       url: config.service.requestUrl,
       login: true,
       success: result => {
         let data = result.data
-
         if (!data.code) {
           userInfo = data.data
-
           success && success(userInfo)
         } else {
           fail && fail()

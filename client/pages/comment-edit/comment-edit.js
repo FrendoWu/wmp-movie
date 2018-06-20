@@ -11,20 +11,67 @@ const RECORDED = 2
 // 播放状态
 const UNPLAYING = 0
 const PLAYING = 1
+// 录音授权状态
+const UNVERIFIED = 0 // 未验证
+const UNAUTHORIZED = 1 // 未授权
+const AUTHORIZED = 2 // 已授权
 
 Page({
-
   data: {
-    recordStatusTip: ['按 住 录 音', '松 开 结 束', '重 新 录 制'],
+    recordStatusTip: ['按 住 录 音', '松 开 结 束', '重 新 录 制'], //录音按钮的文字显示与状态的对应关系
     userInfo: null,
     movie: null,
-    commentContent: "",
-    commentType: 'text',
-    editMode: true,
-    recordStatus: UNRECORDED,
-    recordAudio: null,
-    audioStatus: UNPLAYING
+    commentContent: "", //文本内容，只有在影评内容是text时起效
+    commentType: 'text', // 影评类型，默认为文本
+    editMode: true, // 是否处于编辑状态
+    recordStatus: UNRECORDED, // 录音状态，默认处于未录音
+    recordAudio: null, // 音频对象，只有在影评内容是voice时起效
+    audioStatus: UNPLAYING, // 音频播放状态
+    recordAuthStatus: UNVERIFIED // 录音授权状态
   },
+  /**
+   * 监听页面加载事件
+   * 绑定影评类型
+   * 获取电影详情
+   */
+  onLoad: function(options) {
+    let commentType = options.commentType
+    let movieId = options.movieId
+    this.setData({
+      commentType: commentType
+    })
+    this.getRecordAuth();
+    this.getMovie(movieId);
+  },
+  getRecordAuth() {
+    // 获取用户录音授权状态
+    wx.getSetting({
+      success: (res) => {
+        let auth = res.authSetting['scope.record']
+        if (auth === undefined) {
+          // 未验证
+          this.setData({
+            recordAuthStatus: UNVERIFIED
+          })
+        } else if (auth === false) {
+          // 未授权
+          this.setData({
+            recordAuthStatus: UNAUTHORIZED
+          })
+        } else if (auth === undefined || auth === true) {
+          // 已授权
+          this.setData({
+            recordAuthStatus: AUTHORIZED
+          })
+        }
+      },
+      fail: res => {}
+    })
+  },
+  /**
+   * 监听音频点击事件
+   * 播放或暂停音频
+   */
   onTapAudio() {
     if (this.data.audioStatus === UNPLAYING) {
       innerAudioContext.play()
@@ -32,6 +79,9 @@ Page({
       innerAudioContext.pause()
     }
   },
+  /**
+   * 设置音频参数
+   */
   setAudioOptions() {
     innerAudioContext.onPlay(() => {
       this.setData({
@@ -53,22 +103,13 @@ Page({
         audioStatus: UNPLAYING
       })
     })
-    innerAudioContext.onError((res) => {
-      console.log(res)
-    })
+    innerAudioContext.onError((res) => {})
   },
-  onLoad: function (options) {
-    console.log(options)
-    let commentType = options.commentType
-    let movieId = options.movieId
-    this.setData({
-      commentType: commentType
-    })
-    this.getMovie(movieId);
-  },
-
+  /**
+   * 绑定录音按钮按下事件
+   * 开始录音
+   */
   startRecord() {
-    console.log('start record')
     const options = {
       duration: 60000,
       sampleRate: 44100,
@@ -77,31 +118,54 @@ Page({
       format: 'mp3',
       frameSize: 50
     }
-    recorderManager.start(options)
-    recorderManager.onStart(() => {
-      wx.vibrateShort();
-      innerAudioContext.stop()
-      this.setData({
-        recordStatus: RECORDING,
-        recordAudio: null
+    if (this.data.recordAuthStatus === UNVERIFIED) {
+      recorderManager.onStart(() => {
+        console.log('recorder start')
+        recorderManager.stop();
       })
-    })
+      recorderManager.onPause(() => {
+        console.log('recorder pause')
+      })
+      recorderManager.onStop((res) => {
+        console.log('recorder stop', res)
+        const { tempFilePath } = res
+      })
+      recorderManager.onFrameRecorded((res) => {
+        const { frameBuffer } = res
+        console.log('frameBuffer.byteLength', frameBuffer.byteLength)
+      })
+      recorderManager.onError((res) => {
+        console.log('recorder error', res)
+      })
+      recorderManager.start(options)
+    } else if (this.data.recordAuthStatus === AUTHORIZED) {
+      recorderManager.onStart(() => {
+        wx.vibrateShort();
+        innerAudioContext.stop()
+        this.setData({
+          recordStatus: RECORDING,
+          recordAudio: null
+        })
+      })
+      recorderManager.start(options)
+    }
   },
   endRecord() {
+    if (this.data.recordAuthStatus === AUTHORIZED) {
 
-    recorderManager.stop()
-    recorderManager.onStop((res) => {
-      res['durationText'] = Math.floor(res.duration / 1000 * 100) / 100 + "''"
-      console.log(res)
-      this.setData({
-        recordAudio: res,
-        recordStatus: RECORDED
+    } else if (this.data.recordAuthStatus === AUTHORIZED) {
+      recorderManager.stop()
+      recorderManager.onStop((res) => {
+        res['durationText'] = Math.floor(res.duration / 1000 * 100) / 100 + "''"
+        this.setData({
+          recordAudio: res,
+          recordStatus: RECORDED
+        })
+        innerAudioContext.src = res.tempFilePath
       })
-      innerAudioContext.src = res.tempFilePath
-    })
+    }
   },
   onTapLogin(e) {
-    console.log(e)
     if (e.detail.userInfo) {
       this.setData({
         userInfo: e.detail.userInfo
@@ -138,9 +202,7 @@ Page({
         })
         this.setAudioOptions()
       },
-      fail: () => {
-        console.log('fail')
-      }
+      fail: (error) => {}
     })
   },
   getMovie(movieId) {
@@ -150,8 +212,6 @@ Page({
     qcloud.request({
       url: config.service.movieDetail + movieId,
       success: result => {
-        console.log('<<<>>>')
-        console.log(result)
         if (!result.data.code && result.data.data !== {}) {
           this.setData({
             movie: result.data.data
@@ -164,7 +224,6 @@ Page({
         }
       },
       fail: err => {
-        console.log(err);
         wx.showToast({
           icon: 'none',
           title: '电影详情加载失败'
@@ -179,9 +238,7 @@ Page({
     wx.showLoading({
       title: '正在发布影评'
     })
-    console.log(comment)
     // comment = comment.replace(/\\/g, '\\\\');
-    console.log(comment)
     qcloud.request({
       url: config.service.addComment,
       data: {
@@ -210,7 +267,6 @@ Page({
         }
       },
       fail: result => {
-        console.log(result);
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -224,7 +280,6 @@ Page({
       title: '正在发布影评'
     })
     let url = this.data.recordAudio.tempFilePath;
-    console.log(url)
     wx.uploadFile({
       url: config.service.uploadUrl,
       filePath: url,
@@ -235,21 +290,18 @@ Page({
       success: res => {
         wx.hideLoading();
         let content = JSON.parse(res.data).data.imgUrl;
-        console.log(content);
         cb && cb(content)
       },
       fail: (err) => {
         wx.hideLoading();
-        console.log(err)
       }
     })
   },
-  
   sendComment() {
     let movieId = this.data.movie.id;
     let comment = this.data.commentContent;
     let commentType = this.data.commentType;
-    let duration = this.data.recordAudio ? this.data.recordAudio.duration: null;
+    let duration = this.data.recordAudio ? this.data.recordAudio.duration : null;
     if (commentType === 'text') {
       this.addComment(movieId, comment, commentType, duration)
     } else if (commentType === 'voice') {
