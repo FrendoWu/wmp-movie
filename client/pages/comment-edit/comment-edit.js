@@ -40,19 +40,33 @@ Page({
     this.setData({
       commentType: commentType
     })
-    this.getRecordAuth();
+    this.getRecordAuth(false);
     this.getMovie(movieId);
   },
-  getRecordAuth() {
+  getRecordAuth(ifAskAuth) {
     // 获取用户录音授权状态
     wx.getSetting({
       success: (res) => {
         let auth = res.authSetting['scope.record']
         if (auth === undefined) {
-          // 未验证
-          this.setData({
-            recordAuthStatus: UNVERIFIED
-          })
+          if (ifAskAuth) {
+            wx.authorize({
+              scope: 'scope.record',
+              success: () => {
+                // 已授权
+                this.setData({
+                  recordAuthStatus: AUTHORIZED
+                })
+              },
+              fail: res => {
+                console.log(res)
+                // 未授权
+                this.setData({
+                  recordAuthStatus: UNAUTHORIZED
+                })
+              }
+            })
+          }
         } else if (auth === false) {
           // 未授权
           this.setData({
@@ -105,6 +119,20 @@ Page({
     })
     innerAudioContext.onError((res) => {})
   },
+  settingCallBack(event) {
+    console.log(event)
+    let auth = event.detail.authSetting['scope.record']
+
+    if (auth === false) {
+      this.setData({
+        recordAuthStatus: UNAUTHORIZED
+      })
+    } else {
+      this.setData({
+        recordAuthStatus: AUTHORIZED
+      })
+    }
+  },
   /**
    * 绑定录音按钮按下事件
    * 开始录音
@@ -119,25 +147,7 @@ Page({
       frameSize: 50
     }
     if (this.data.recordAuthStatus === UNVERIFIED) {
-      recorderManager.onStart(() => {
-        console.log('recorder start')
-        recorderManager.stop();
-      })
-      recorderManager.onPause(() => {
-        console.log('recorder pause')
-      })
-      recorderManager.onStop((res) => {
-        console.log('recorder stop', res)
-        const { tempFilePath } = res
-      })
-      recorderManager.onFrameRecorded((res) => {
-        const { frameBuffer } = res
-        console.log('frameBuffer.byteLength', frameBuffer.byteLength)
-      })
-      recorderManager.onError((res) => {
-        console.log('recorder error', res)
-      })
-      recorderManager.start(options)
+      this.getRecordAuth(true)
     } else if (this.data.recordAuthStatus === AUTHORIZED) {
       recorderManager.onStart(() => {
         wx.vibrateShort();
@@ -152,8 +162,6 @@ Page({
   },
   endRecord() {
     if (this.data.recordAuthStatus === AUTHORIZED) {
-
-    } else if (this.data.recordAuthStatus === AUTHORIZED) {
       recorderManager.stop()
       recorderManager.onStop((res) => {
         res['durationText'] = Math.floor(res.duration / 1000 * 100) / 100 + "''"
