@@ -71,3 +71,29 @@ navigator.button-with-icon {
   font-size: 30rpx;
   line-height: 42rpx;
 }
+
+.movie-empty {
+  margin: 50rpx;
+  height: 300rpx;
+  width: 650rpx;
+  border-radius: 20rpx; 
+  box-shadow: 0 6px 10px 0 rgba(0,0,0,.23), 0 6px 10px 0 rgba(0,0,0,.23);
+  position: relative;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-image {
+  margin: 0 auto;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: rgba(139, 139, 139, 0.8);
+}

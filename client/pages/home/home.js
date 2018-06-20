@@ -89,6 +89,7 @@ Page({
       this.setData({
         userInfo: e.detail.userInfo
       })
+      this.getRecommendComment();
     }
   },
   onShow: function () {

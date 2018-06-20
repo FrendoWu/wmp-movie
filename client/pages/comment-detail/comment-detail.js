@@ -87,6 +87,12 @@ Page({
       }
     })
   },
+  imgZoom() {
+    wx.previewImage({
+      current: this.data.comment.movieImage, // 当前显示图片的http链接
+      urls: [this.data.comment.movieImage] // 需要预览的图片http链接列表
+    })
+  },
   onTapLogin(e) {
     console.log(e)
     if (e.detail.userInfo) {

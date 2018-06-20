@@ -1,6 +1,6 @@
 <view class='movie-container'>
   <view class="movie-detail">
-    <image class='movie-image' src="{{movie.image}}"></image>
+    <image class='movie-image' src="{{movie.image}}" bindtap='imgZoom'></image>
     <view class='movie-title'>{{movie.title}}</view>
     <view class='movie-category'>{{movie.category}}</view>
     <view class='movie-description'>{{movie.description}}</view>

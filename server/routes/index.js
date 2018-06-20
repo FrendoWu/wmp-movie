@@ -39,6 +39,8 @@ router.get('/movie/:id', controllers.movie.detail)
 
 // 随机获取一条影评
 router.get('/comment/recommend', validationMiddleware, controllers.comment.getOne)
+// 获取用户发布的影评
+router.get('/comment/user', validationMiddleware, controllers.comment.userList)
 // 提交影评
 router.post('/comment', validationMiddleware, controllers.comment.add)
 // 影评列表

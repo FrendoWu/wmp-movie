@@ -1,28 +1,38 @@
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
 const app = getApp();
+// 列表类型
+const COLLECTION = 0
+const PUBLISH = 1
 
 Page({
   data: {
     userInfo: null,
-    collections: []
+    comments: [],
+    listType: COLLECTION
   },
-  
   onLoad: function (options) {
     app.login({
       success: (userInfo) => {
         this.setData({
           userInfo: userInfo
         })
-        this.getCollection();
+        this.getList();
       },
       fail: () => {
         console.log('fail')
       }
     })
   },
+  onTapListType(event) {
+    let listType = +event.currentTarget.dataset.type;
+    this.setData({
+      listType: listType
+    })
+    this.getList();
+  },
   onPullDownRefresh() {
-    this.getCollection(() => {
+    this.getList(() => {
       wx.stopPullDownRefresh();
     });
   },
@@ -36,12 +46,12 @@ Page({
         console.log(result)
         wx.hideLoading();
         if (!result.data.code) {
-          let collections = result.data.data;
-          collections.forEach(collection => {
-            collection['durationText'] = Math.floor(collection.duration / 1000 * 100) / 100 + "''"
+          let comments = result.data.data;
+          comments.forEach(comment => {
+            comment['durationText'] = Math.floor(comment.duration / 1000 * 100) / 100 + "''"
           })
           this.setData({
-            collections: collections
+            comments: comments
           });
         } else {
           wx.showToast({
@@ -62,6 +72,50 @@ Page({
         cb && cb()
       }
     })
+  },
+  getUserComments(cb) {
+    wx.showLoading({
+      title: '发布影评加载中'
+    })
+    qcloud.request({
+      url: config.service.userComment,
+      success: result => {
+        console.log(result)
+        wx.hideLoading();
+        if (!result.data.code) {
+          let comments = result.data.data;
+          comments.forEach(comment => {
+            comment['durationText'] = Math.floor(comment.duration / 1000 * 100) / 100 + "''"
+          })
+          this.setData({
+            comments: comments
+          });
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '发布影评加载失败'
+          })
+        }
+      },
+      fail: err => {
+        console.log(err);
+        wx.hideLoading();
+        wx.showToast({
+          icon: 'none',
+          title: '发布影评加载失败'
+        })
+      },
+      complete: result => {
+        cb && cb()
+      }
+    })
+  },
+  getList(cb){
+    if (this.data.listType === COLLECTION) {
+      this.getCollection(cb);
+    } else if (this.data.listType === PUBLISH){
+      this.getUserComments(cb);
+    }
   },
   onTapLogin(e) {
     console.log(e)

@@ -36,6 +36,8 @@ var config = {
         commentDetail: `${host}/weapp/comment/`,
         // 获得推荐影评
         commentRecommend: `${host}/weapp/comment/recommend`,
+        // 获得用户发布的影评
+        userComment: `${host}/weapp/comment/user`,
 
         // 更新收藏状态
         updateCollection: `${host}/weapp/collection`,

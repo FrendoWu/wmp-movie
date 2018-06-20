@@ -7,6 +7,10 @@ module.exports = {
     let user = ctx.state.$wxInfo.userinfo.openId;
     ctx.state.data = (await DB.query("Select comment.id as commentId, comment.movie_id as movieId, comment.user_name as userName, comment.user_avatar as userAvatar, movie.title as movieTitle, movie.image as movieImage,rand() as tag from comment left join movie on comment.movie_id = movie.id where comment.user_id <> ? and comment.id not in (SELECT collection.comment_id from collection where collection.user_id = ?) order by tag desc LIMIT 1", [user, user]))[0] || null
   },
+  userList: async ctx => {
+    let user = ctx.state.$wxInfo.userinfo.openId;
+    ctx.state.data = await DB.query('Select comment.id as commentId, comment.content as content, comment.duration as duration, comment.type as type, comment.user_avatar as userAvatar, comment.user_name as userName, movie.image as movieImage, movie.title as movieTitle from comment left join movie on comment.movie_id = movie.id where user_id = ?', [user])
+  },
   list: async ctx => {
     let movieId = ctx.request.query.movieId;
     if (!isNaN(movieId)) {

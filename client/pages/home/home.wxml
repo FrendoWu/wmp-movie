@@ -29,6 +29,6 @@
   </view>
   <view class="movie-empty movie-container" wx:if="{{!comment}}">
     <image class="empty-image" src="/images/hot-disable.png"></image>
-    <view class="empty-text">暂时还没有热门电影</view>
+    <view class="empty-text">暂时还没有可推荐电影</view>
   </view>
 </view>

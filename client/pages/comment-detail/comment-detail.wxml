@@ -11,7 +11,7 @@
 <view wx:else>
   <view class='movie-container'>
     <view class="movie-detail">
-      <image class='movie-image' src="{{comment.movieImage}}"></image>
+      <image class='movie-image' src="{{comment.movieImage}}" bindtap='imgZoom'></image>
       <view class='movie-title'>{{comment.movieTitle}}</view>
       <view class='comment-title-container'>
         <view class='user-avatar-container'>
@@ -33,7 +33,7 @@
       </view>
       <view class='btn-container'>
         <view class='btn-wrapper' bindtap='onTapStar'>
-          <image class='btn-image' src="{{comment.collectionId? '/images/star.png': '/images/star_disable.png'}}"></image>
+          <image class='btn-image' src="{{comment.collectionId? '/images/star.png': '/images/star-disable.png'}}"></image>
           <view class="btn-text">{{comment.collectionId? '取消收藏': '收藏影评'}}</view>
         </view>
         <view class='btn-wrapper' bindtap='onTapEdit' data-id="{{comment.movieId}}">
