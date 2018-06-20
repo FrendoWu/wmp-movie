@@ -76,3 +76,49 @@
   border-radius: 0;
   border-top: 2rpx solid #9e9e9e;
 }
+.user-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 30rpx;
+}
+.user-avatar {
+  height: 60rpx;
+  width: 60rpx;
+  background: #eeeeee;
+  border-radius: 50%;
+}
+.user-name {
+  padding-left: 20rpx;
+  font-size: 32rpx;
+  line-height: 45rpx;
+  color: #9e9e9e;
+}
+.collection-text {
+  margin-top: 20rpx;
+  font-size: 30rpx;
+  line-height: 42rpx;
+  height: 84rpx;
+}
+.audio-container {
+  border: 1rpx solid #9e9e9e;
+  text-align: center;
+  display: flex;
+  width: 300rpx;
+  height: 60rpx;
+  margin-top: 20rpx;
+  background-color: #eeeeee;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 8rpx;
+}
+.audio-image {
+  margin-left: 20rpx;
+  height: 60rpx;
+  width: 60rpx;
+}
+.audio-duration {
+  font-size: 30rpx;
+  line-height: 42rpx;
+}

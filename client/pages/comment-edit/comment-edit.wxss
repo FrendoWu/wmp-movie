@@ -177,6 +177,8 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  border-radius: 8rpx;
+  background-color: #eeeeee;
 }
 .audio-image {
   height: 60rpx;

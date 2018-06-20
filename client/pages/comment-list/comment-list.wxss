@@ -69,6 +69,7 @@
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  border-radius: 8rpx;
 }
 .audio-image {
   margin-left: 20rpx;

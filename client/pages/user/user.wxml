@@ -16,10 +16,18 @@
     <view class='movie-description'>
       <view class='movie-title'>{{collection.movieTitle}}</view>
       <view wx:if="{{collection.type === 'text'}}">
+        <view class='collection-text'>{{collection.content}}</view>
       </view>
       <view wx:if="{{collection.type === 'voice'}}">
+        <view class="audio-container">
+          <image src="/images/play.png" class='audio-image'></image>
+          <view class='audio-duration'>{{collection.durationText}}</view>
+        </view>
       </view>
-      <view></view>
+      <view class='user-container'>
+        <image src='{{collection.userAvatar}}' class='user-avatar'></image>
+        <view class='user-name'>{{collection.userName}}</view>
+      </view>
     </view>
   </view>
   </view>

@@ -36,8 +36,12 @@ Page({
         console.log(result)
         wx.hideLoading();
         if (!result.data.code) {
+          let collections = result.data.data;
+          collections.forEach(collection => {
+            collection['durationText'] = Math.floor(collection.duration / 1000 * 100) / 100 + "''"
+          })
           this.setData({
-            collections: result.data.data
+            collections: collections
           });
         } else {
           wx.showToast({
