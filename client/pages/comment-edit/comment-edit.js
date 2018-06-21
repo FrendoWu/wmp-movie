@@ -43,6 +43,73 @@ Page({
     this.getRecordAuth(false);
     this.getMovie(movieId);
   },
+  /**
+   * 监听页面显示
+   * 登录并设置设置录音状态和参数
+   */
+  onShow() {
+    app.login({
+      success: userInfo => {
+        this.setData({
+          userInfo: userInfo,
+          recordStatus: UNRECORDED
+        })
+        this.setAudioOptions()
+      },
+      fail: error => {
+        console.log(error)
+      }
+    })
+  },
+  /**
+   * 微信登录按钮绑定事件
+   * 获取用户信息
+   */
+  onTapLogin(e) {
+    if (e.detail.userInfo) {
+      this.setData({
+        userInfo: e.detail.userInfo
+      })
+    }
+  },
+  /**
+   * 完成按钮点击事件
+   * 修改编辑状态为预览状态，并修改导航栏标题
+   */
+  onTapFinishBtn() {
+    this.setData({
+      editMode: false
+    })
+    wx.setNavigationBarTitle({
+      title: '影评预览'
+    })
+  },
+  /**
+   * 返回编辑按钮点击事件
+   * 修改编辑状态为编辑状态，并修改导航栏标题
+   */
+  onTapEditBack() {
+    this.setData({
+      editMode: true
+    })
+    wx.setNavigationBarTitle({
+      title: '编辑影评'
+    })
+  },
+  /**
+   * 绑定用户输入文字影评事件
+   * 绑定commentContent数据
+   */
+  onInputComment(event) {
+    this.setData({
+      commentContent: event.detail.value
+    })
+  },
+  /**
+   * 获取用户的录音权限
+   * ifAskAuth用于区分登录时或是点击录音按钮检查状态
+   * 登录时只判断当前用户授权状态，但不做操作，如果是未验证点击录音按钮则要求用户授权录音
+   */
   getRecordAuth(ifAskAuth) {
     // 获取用户录音授权状态
     wx.getSetting({
@@ -58,8 +125,8 @@ Page({
                   recordAuthStatus: AUTHORIZED
                 })
               },
-              fail: res => {
-                console.log(res)
+              fail: error => {
+                console.log(error)
                 // 未授权
                 this.setData({
                   recordAuthStatus: UNAUTHORIZED
@@ -72,14 +139,16 @@ Page({
           this.setData({
             recordAuthStatus: UNAUTHORIZED
           })
-        } else if (auth === undefined || auth === true) {
+        } else if (auth === true) {
           // 已授权
           this.setData({
             recordAuthStatus: AUTHORIZED
           })
         }
       },
-      fail: res => {}
+      fail: error => {
+        console.log(error)
+      }
     })
   },
   /**
@@ -117,8 +186,14 @@ Page({
         audioStatus: UNPLAYING
       })
     })
-    innerAudioContext.onError((res) => {})
+    innerAudioContext.onError(error => {
+      console.log(error)
+    })
   },
+  /**
+   * 录音授权openSetting结束后的回调函数
+   * 根据回调函数返回值设置授权状态
+   */
   settingCallBack(event) {
     console.log(event)
     let auth = event.detail.authSetting['scope.record']
@@ -135,7 +210,9 @@ Page({
   },
   /**
    * 绑定录音按钮按下事件
-   * 开始录音
+   * 未验证则请求用户授权，不会触发endRecord事件
+   * 授权后手机轻微振动
+   * 音频播放停止，防止用户的音频还在播放导致重新录制有杂音
    */
   startRecord() {
     const options = {
@@ -160,8 +237,13 @@ Page({
       recorderManager.start(options)
     }
   },
+  /**
+   * 绑定录音按钮抬起事件
+   * 录音未验证不会进入该事件
+   * 获得音频修改音频对象recordAudio
+   */
   endRecord() {
-    if (this.data.recordAuthStatus === AUTHORIZED) {
+    // if (this.data.recordAuthStatus === AUTHORIZED) {
       recorderManager.stop()
       recorderManager.onStop((res) => {
         res['durationText'] = Math.floor(res.duration / 1000 * 100) / 100 + "''"
@@ -171,48 +253,11 @@ Page({
         })
         innerAudioContext.src = res.tempFilePath
       })
-    }
+    // }
   },
-  onTapLogin(e) {
-    if (e.detail.userInfo) {
-      this.setData({
-        userInfo: e.detail.userInfo
-      })
-    }
-  },
-  onTapFinishBtn() {
-    this.setData({
-      editMode: false
-    })
-    wx.setNavigationBarTitle({
-      title: '影评预览'
-    })
-  },
-  onTapEditBack() {
-    this.setData({
-      editMode: true
-    })
-    wx.setNavigationBarTitle({
-      title: '编辑影评'
-    })
-  },
-  onInputComment(event) {
-    this.setData({
-      commentContent: event.detail.value
-    })
-  },
-  onShow() {
-    app.login({
-      success: (userInfo) => {
-        this.setData({
-          userInfo: userInfo,
-          recordStatus: UNRECORDED
-        })
-        this.setAudioOptions()
-      },
-      fail: (error) => {}
-    })
-  },
+  /**
+   * 获得电影详情
+   */
   getMovie(movieId) {
     wx.showLoading({
       title: '电影详情加载中'
@@ -231,7 +276,8 @@ Page({
           })
         }
       },
-      fail: err => {
+      fail: error => {
+        console.log(error)
         wx.showToast({
           icon: 'none',
           title: '电影详情加载失败'
@@ -242,6 +288,10 @@ Page({
       }
     });
   },
+  /**
+   * 向服务器添加评论，
+   * comment：文字评论时指的是文字内容，音频评论时指的是音频url地址
+   */
   addComment(movieId, comment, commentType, duration) {
     wx.showLoading({
       title: '正在发布影评'
@@ -274,7 +324,8 @@ Page({
           })
         }
       },
-      fail: result => {
+      fail: error => {
+        console.log(error)
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -283,10 +334,10 @@ Page({
       }
     })
   },
+  /**
+   * 上传音频文件到腾讯云存储桶
+   */
   uploadVoice(cb) {
-    wx.showLoading({
-      title: '正在发布影评'
-    })
     let url = this.data.recordAudio.tempFilePath;
     wx.uploadFile({
       url: config.service.uploadUrl,
@@ -296,15 +347,21 @@ Page({
         'content-type': 'multipart/form-data'
       },
       success: res => {
-        wx.hideLoading();
+        console.log(res)
         let content = JSON.parse(res.data).data.imgUrl;
         cb && cb(content)
       },
-      fail: (err) => {
-        wx.hideLoading();
+      fail: error => {
+        console.log(error)
       }
     })
   },
+  /**
+   * 绑定发布影评按钮
+   * 根据影评类型做相应操作
+   * 文字影评直接上传数据库
+   * 音频影评先将音频上传至对象存储，将返回的对象存储url上传数据库
+   */
   sendComment() {
     let movieId = this.data.movie.id;
     let comment = this.data.commentContent;

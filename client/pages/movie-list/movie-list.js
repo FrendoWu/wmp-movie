@@ -78,7 +78,8 @@ Page({
           })
         }
       },
-      fail: err => {
+      fail: error => {
+        console.log(error)
         wx.showToast({
           icon: 'none',
           title: '电影列表加载失败'

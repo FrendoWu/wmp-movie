@@ -36,9 +36,13 @@
           <image class='btn-image' src="{{comment.collectionId? '/images/star.png': '/images/star-disable.png'}}"></image>
           <view class="btn-text">{{comment.collectionId? '取消收藏': '收藏影评'}}</view>
         </view>
-        <view class='btn-wrapper' bindtap='onTapEdit' data-id="{{comment.movieId}}">
+        <view wx:if="{{comment.userId !== userInfo.openId && userComments.length === 0}}" class='btn-wrapper' bindtap='onTapEdit'>
           <image class='btn-image' src="/images/edit.png"></image>
           <view class='btn-text'>写影评</view>
+        </view>
+        <view wx:if="{{comment.userId !== userInfo.openId && userComments.length > 0}}" class='btn-wrapper' bindtap='goToUserComment'>
+          <image class='btn-image-see' src="/images/see.png"></image>
+          <view class='btn-text'>我的影评</view>
         </view>
       </view>
     </view>

@@ -82,6 +82,10 @@
   width: 50rpx;
   height: 50rpx;
 }
+.btn-image-see {
+  width: 45rpx;
+  height: 30rpx;
+}
 .btn-text {
   font-size: 32rpx;
   line-height: 48rpx;

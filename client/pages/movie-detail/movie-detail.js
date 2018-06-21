@@ -3,7 +3,8 @@ const config = require('../../config.js');
 
 Page({
   data: {
-    movie: null
+    movie: null,
+    comments: null
   },
   /**
    * 监听页面加载事件
@@ -12,6 +13,7 @@ Page({
   onLoad: function(options) {
     let movieId = options.id;
     this.getMovie(movieId);
+    this.getUserComments(movieId);
   },
   /**
    * 跳转至电影影评列表界面
@@ -53,7 +55,8 @@ Page({
           })
         }
       },
-      fail: err => {
+      fail: error => {
+        console.log(error)
         wx.showToast({
           icon: 'none',
           title: '电影详情加载失败'
@@ -61,6 +64,34 @@ Page({
       },
       complete: result => {
         wx.hideLoading();
+      }
+    });
+  },
+  /**
+   * 获取用户对于该电影的影评，用于判断是否需要显示添加影评按钮
+   */
+  getUserComments(movieId) {
+    qcloud.request({
+      url: config.service.userComment + `?movieId=${movieId}`,
+      success: result => {
+        console.log(result)
+        if (!result.data.code) {
+          this.setData({
+            comments: result.data.data
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '用户影评加载失败'
+          })
+        }
+      },
+      fail: error => {
+        console.log(error)
+        wx.showToast({
+          icon: 'none',
+          title: '用户影评加载失败'
+        })
       }
     });
   },
@@ -73,7 +104,7 @@ Page({
     let commentType = '';
     wx.showActionSheet({
       itemList: ['文字', '音频'],
-      success: function(res) {
+      success: res => {
         if (res.tapIndex === 0) {
           // 文字
           commentType = 'text'
@@ -85,7 +116,8 @@ Page({
           url: `/pages/comment-edit/comment-edit?movieId=${movieId}&commentType=${commentType}`
         })
       },
-      fail: function(res) {
+      fail: error => {
+        console.log(error)
       }
     })
   }

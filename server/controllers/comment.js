@@ -11,10 +11,13 @@ module.exports = {
   },
   /**
    * 获取用户发布的影评
+   * 如果有movieId, 则返回该movieId下的该用户的影评
    */
   userList: async ctx => {
     let user = ctx.state.$wxInfo.userinfo.openId;
-    ctx.state.data = await DB.query('Select comment.id as commentId, comment.content as content, comment.duration as duration, comment.type as type, comment.user_avatar as userAvatar, comment.user_name as userName, movie.image as movieImage, movie.title as movieTitle from comment left join movie on comment.movie_id = movie.id where user_id = ?', [user])
+    let movieId = ctx.request.query.movieId;
+    if (!movieId) movieId = null
+    ctx.state.data = await DB.query('Select comment.id as commentId, comment.content as content, comment.duration as duration, comment.type as type, comment.user_avatar as userAvatar, comment.user_name as userName, movie.image as movieImage, movie.title as movieTitle from comment left join movie on comment.movie_id = movie.id where user_id = ? and comment.movie_id = ifnull(?, comment.movie_id)', [user, movieId])
   },
   /**
    * 根据电影id获取影评列表

@@ -26,7 +26,8 @@ App({
           this.getUserInfo({ success, fail, complete })
         }
       },
-      fail: () => {
+      fail: error => {
+        console.log(error)
         fail && fail()
       },
       complete: () => {
@@ -50,7 +51,8 @@ App({
           fail && fail()
         }
       },
-      fail: () => {
+      fail: error => {
+        console.log(error)
         fail && fail()
       },
       complete: () => {

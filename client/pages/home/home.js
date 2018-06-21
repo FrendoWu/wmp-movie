@@ -13,13 +13,14 @@ Page({
    */
   onLoad: function (options) {
     app.login({
-      success: (userInfo) => {
+      success: userInfo => {
         this.setData({
           userInfo: userInfo
         })
         this.getRecommendComment();
       },
-      fail: (error) => {
+      fail: error => {
+        console.log(error)
       }
     })
   },
@@ -41,12 +42,13 @@ Page({
    */
   onShow: function () {
     app.login({
-      success: (userInfo) => {
+      success: userInfo => {
         this.setData({
           userInfo: userInfo
         })
       },
-      fail: (error) => {
+      fail: error => {
+        console.log(error)
       }
     })
   },
@@ -103,7 +105,8 @@ Page({
           })
         }
       },
-      fail: err => {
+      fail: error => {
+        console.log(error)
         wx.hideLoading();
         wx.showToast({
           icon: 'none',

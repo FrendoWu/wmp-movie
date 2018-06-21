@@ -18,13 +18,14 @@ Page({
    */
   onLoad: function (options) {
     app.login({
-      success: (userInfo) => {
+      success: userInfo => {
         this.setData({
           userInfo: userInfo
         })
         this.getList();
       },
-      fail: (error) => {
+      fail: error => {
+        console.log(error)
       }
     })
   },
@@ -39,7 +40,8 @@ Page({
           userInfo: userInfo
         })
       },
-      fail: (error) => {
+      fail: error => {
+        console.log(error)
       }
     })
   },
@@ -117,7 +119,8 @@ Page({
           })
         }
       },
-      fail: err => {
+      fail: error => {
+        console.log(error)
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -155,7 +158,8 @@ Page({
           })
         }
       },
-      fail: err => {
+      fail: error => {
+        console.log(error)
         wx.hideLoading();
         wx.showToast({
           icon: 'none',

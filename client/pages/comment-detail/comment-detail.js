@@ -14,27 +14,43 @@ const STARED = 1
 Page({
   data: {
     comment: null,
+    userComments: null,
     audioStatus: UNPLAYING,
     userInfo: null,
     starStatus: null
   },
+  /**
+   * 监听页面加载完成事件
+   * 获得影评详情
+   * comment信息中包含该用户收藏该影评的collectionId,用户对于该电影影评的userCommentId
+   */
   onLoad: function (options) {
     let commentId = options.commentId;
     this.getCommentDetail(commentId);
   },
+  /**
+   * 监听页面显示事件
+   * 获取用户信息并设置音频参数
+   */
   onShow() {
     app.login({
-      success: (userInfo) => {
+      success: userInfo => {
+        console.log(userInfo)
         this.setData({
           userInfo: userInfo
         })
         this.setAudioOptions()
 
       },
-      fail: (error) => {
+      fail: error => {
+        console.log(error)
       }
     })
   },
+  /**
+   * 绑定音频点击事件
+   * 播放或暂停音频
+   */
   onTapAudio() {
     if (this.data.audioStatus === UNPLAYING) {
       innerAudioContext.play()
@@ -42,6 +58,10 @@ Page({
       innerAudioContext.pause()
     }
   },
+  /**
+   * 绑定收藏或取消收藏按钮事件
+   * 提交数据库用于插入或删除一条记录
+   */
   onTapStar() {
     let commentId = this.data.comment.commentId;
     // 待修改后的starStatus
@@ -71,7 +91,8 @@ Page({
           })
         }
       },
-      fail: result => {
+      fail: error => {
+        console.log(error)
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
@@ -80,12 +101,19 @@ Page({
       }
     })
   },
+  /**
+   * 绑定图片点击事件
+   * 放大浏览大图
+   */
   imgZoom() {
     wx.previewImage({
       current: this.data.comment.movieImage, // 当前显示图片的http链接
       urls: [this.data.comment.movieImage] // 需要预览的图片http链接列表
     })
   },
+  /**
+   * 绑定微信登录按钮点击事件
+   */
   onTapLogin(e) {
     if (e.detail.userInfo) {
       this.setData({
@@ -93,12 +121,26 @@ Page({
       })
     }
   },
+  /**
+   * 绑定我的影评按钮事件
+   * 跳转至该用户对于该电影的影评
+   */
+  goToUserComment() {
+    let commentId = this.data.userComments[0].commentId;
+    wx.navigateTo({
+      url: `/pages/comment-detail/comment-detail?commentId=${commentId}`
+    })
+  },
+  /**
+   * 绑定写影评按钮
+   * 跳转至影评编辑页面
+   */
   onTapEdit() {
     let movieId = this.data.comment.movieId;
     let commentType = this.data.comment.type;
     wx.showActionSheet({
       itemList: ['文字', '音频'],
-      success: function (res) {
+      success: res => {
         if (res.tapIndex === 0) {
           // 文字
           commentType = 'text'
@@ -110,10 +152,14 @@ Page({
           url: `/pages/comment-edit/comment-edit?movieId=${movieId}&commentType=${commentType}`
         })
       },
-      fail: function (res) {
+      fail: error => {
+        console.log(error)
       }
     })
   },
+  /**
+   * 设置音频播放按钮
+   */
   setAudioOptions() {
     innerAudioContext.onPlay(() => {
       this.setData({
@@ -138,11 +184,16 @@ Page({
     innerAudioContext.onError((res) => {
     })
   },
+  /**
+   * 获得评论详情
+   */
   getCommentDetail(commentId) {
     qcloud.request({
       url: config.service.commentDetail + commentId,
       method: 'GET',
       success: result => {
+        console.log(result)
+        console.log(this.data.userInfo)
         if (!result.data.code) {
           let comment = result.data.data;
           comment.createTime = util.formatTime(new Date(comment.createTime))
@@ -151,6 +202,9 @@ Page({
             comment: comment
           })
           innerAudioContext.src = this.data.comment.content;
+          // 获取登录用户的该电影的影评
+          let movieId = comment.movieId;
+          this.getUserComments(movieId);
         } else {
           wx.showToast({
             icon: 'none',
@@ -158,12 +212,41 @@ Page({
           })
         }
       },
-      fail: result => {
+      fail: error => {
+        console.log(error)
         wx.showToast({
           icon: 'none',
           title: '获取影评失败'
         })
       }
     })
-  }
+  },
+  /**
+   * 获取用户对于该电影的影评，用于判断是否需要显示写影评按钮
+   */
+  getUserComments(movieId) {
+    qcloud.request({
+      url: config.service.userComment + `?movieId=${movieId}`,
+      success: result => {
+        console.log(result)
+        if (!result.data.code) {
+          this.setData({
+            userComments: result.data.data
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '用户影评加载失败'
+          })
+        }
+      },
+      fail: error => {
+        console.log(error)
+        wx.showToast({
+          icon: 'none',
+          title: '用户影评加载失败'
+        })
+      }
+    });
+  },
 })

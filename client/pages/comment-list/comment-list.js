@@ -129,7 +129,8 @@ Page({
           })
         }
       },
-      fail: result => {
+      fail: error => {
+        console.log(error)
         wx.hideLoading();
         wx.showToast({
           icon: 'none',
