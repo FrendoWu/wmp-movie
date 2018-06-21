@@ -34,7 +34,7 @@ router.post('/message', controllers.message.post)
 
 // 获取电影列表
 router.get('/movie', controllers.movie.list)
-// 获取电影列表
+// 获取电影详情
 router.get('/movie/:id', controllers.movie.detail)
 
 // 随机获取一条影评

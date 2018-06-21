@@ -22,10 +22,10 @@
       <view wx:if="{{commentType === 'text'}}" class='comment-container'>
         <view class='comment-left'>”</view>
         <view class='comment-right'>
-          <textarea placeholder="输入你的影评内容..." auto-focus='true' show-confirm-bar='true' placeholder-class="text-placeholder" bindinput='onInputComment' maxlength='120' value="{{commentContent}}" wx:if="{{editMode}}"></textarea>
+          <textarea placeholder="输入你的影评内容..." auto-focus='true' show-confirm-bar='true' placeholder-class="text-placeholder" bindinput='onInputComment' maxlength='500' value="{{commentContent}}" wx:if="{{editMode}}"></textarea>
           <view wx:else class='comment-content'>{{commentContent}}</view>
         </view>
-        <view class='wordCounter' wx:if="{{editMode}}">{{commentContent.length}}/120</view>
+        <view class='wordCounter' wx:if="{{editMode}}">{{commentContent.length}}/500</view>
       </view>
       <view wx:elif="{{commentType === 'voice'}}">
         <view class="audio-container {{recordAudio? 'visible': 'disvisible'}}" bindtap='onTapAudio'>

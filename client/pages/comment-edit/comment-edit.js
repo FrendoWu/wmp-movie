@@ -313,7 +313,7 @@ Page({
             title: '发布影评成功'
           })
           setTimeout(() => {
-            wx.navigateTo({
+            wx.redirectTo({
               url: '/pages/comment-list/comment-list?movieId=' + movieId
             })
           }, 1500)

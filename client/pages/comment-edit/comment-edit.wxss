@@ -62,7 +62,7 @@
 }
 .comment-container textarea {
   width: 100%;
-  display: inline-block;
+  display: inline-block; 
   margin-top: 20rpx;
   font-size: 32rpx;
   line-height: 45rpx;
