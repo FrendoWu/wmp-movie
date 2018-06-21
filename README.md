@@ -142,8 +142,5 @@ router.post('/collection', validationMiddleware, controllers.collection.update)
   - 跳转至`影评详情页`
 
 #### 界面截图
-<figure class="half">
-    <a href="https://movies-1256897003.cos.ap-shanghai.myqcloud.com/screenshot/comment_detail.png"><img src="https://movies-1256897003.cos.ap-shanghai.myqcloud.com/screenshot/comment_detail.png"></a>
-    <a href="https://movies-1256897003.cos.ap-shanghai.myqcloud.com/screenshot/comment_detail.png"><img src="https://movies-1256897003.cos.ap-shanghai.myqcloud.com/screenshot/comment_detail.png"></a>
-</figure>
+![screenshot](https://movies-1256897003.cos.ap-shanghai.myqcloud.com/screenshot/screenshot.png)
 
