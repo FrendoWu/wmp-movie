@@ -1,16 +1,13 @@
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
+const constant = require('../../constant.js');
 const app = getApp();
-
-// 列表类型
-const COLLECTION = 0
-const PUBLISH = 1
 
 Page({
   data: {
     userInfo: null,
     comments: [],
-    listType: COLLECTION //列表类型，收藏或者发布
+    listType: constant.COLLECTION //列表类型，收藏或者发布
   },
   /**
    * 监听页面加载事件
@@ -175,9 +172,9 @@ Page({
    * 根据列表类型调用不同函数获取列表
    */
   getList(cb){
-    if (this.data.listType === COLLECTION) {
+    if (this.data.listType === constant.COLLECTION) {
       this.getCollection(cb);
-    } else if (this.data.listType === PUBLISH){
+    } else if (this.data.listType === constant.PUBLISH){
       this.getUserComments(cb);
     }
   }

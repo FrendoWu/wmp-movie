@@ -12,7 +12,7 @@ module.exports = {
    * 获取电影详情
    */
   detail: async ctx => {
-    movieId = + ctx.params.id
+    const movieId = + ctx.params.id
     if (!isNaN(movieId)) {
       ctx.state.data = (await DB.query("Select * from movie where id = ?", [movieId]))[0]
     } else {

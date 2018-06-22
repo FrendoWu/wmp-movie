@@ -1,12 +1,9 @@
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
 const util = require('../../utils/util.js');
+const constant = require('../../constant.js');
 const app = getApp();
 const innerAudioContext = wx.createInnerAudioContext()
-
-// 播放状态
-const UNPLAYING = 0
-const PLAYING = 1
 
 Page({
   data: {
@@ -37,9 +34,9 @@ Page({
     let audioStatus = [];
     for (let i = 0; i < this.data.audioStatus.length; i++) {
       if (i === index) {
-        audioStatus.push(PLAYING);
+        audioStatus.push(constant.PLAYING);
       } else {
-        audioStatus.push(UNPLAYING);
+        audioStatus.push(constant.UNPLAYING);
       }
     }
     innerAudioContext.play()
@@ -113,7 +110,7 @@ Page({
           comments.forEach(comment => {
             comment.createTime = util.formatTime(new Date(comment.createTime))
             comment['durationText'] = Math.floor(comment.duration / 1000 * 100) / 100 + "''"
-            audioStatus.push(UNPLAYING)
+            audioStatus.push(constant.UNPLAYING)
           })
           this.setData({
             comments: comments,

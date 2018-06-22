@@ -2,20 +2,15 @@ const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
 const util = require('../../utils/util.js');
 const app = getApp();
+const constant = require('../../constant.js');
 
 const innerAudioContext = wx.createInnerAudioContext()
-// 播放状态
-const UNPLAYING = 0
-const PLAYING = 1
-// 收藏状态
-const UNSTAR = 0
-const STARED = 1
 
 Page({
   data: {
     comment: null,
     userComments: null,
-    audioStatus: UNPLAYING,
+    audioStatus: constant.UNPLAYING,
     userInfo: null,
     starStatus: null
   },
@@ -52,9 +47,9 @@ Page({
    * 播放或暂停音频
    */
   onTapAudio() {
-    if (this.data.audioStatus === UNPLAYING) {
+    if (this.data.audioStatus === constant.UNPLAYING) {
       innerAudioContext.play()
-    } else if (this.data.audioStatus === PLAYING) {
+    } else if (this.data.audioStatus === constant.PLAYING) {
       innerAudioContext.pause()
     }
   },
@@ -65,7 +60,7 @@ Page({
   onTapStar() {
     let commentId = this.data.comment.commentId;
     // 待修改后的starStatus
-    let starStatus = this.data.comment.collectionId ? UNSTAR : STARED;
+    let starStatus = this.data.comment.collectionId ? constant.UNSTAR : constant.STARED;
     let text = this.data.comment.collectionId ? '取消收藏' : '收藏';
     wx.showLoading({
       title: '正在' + text

@@ -12,9 +12,8 @@ module.exports = {
    * 如果是取消收藏，则从数据库中删除对应信息
    */
   update: async ctx => {
-    let user = ctx.state.$wxInfo.userinfo.openId;
-    let commentId = +ctx.request.body.commentId;
-    let starStatus = ctx.request.body.starStatus;
+    const user = ctx.state.$wxInfo.userinfo.openId;
+    const { commentId, starStatus } = +ctx.request.body;
     if (!isNaN(commentId)) {
       if (starStatus === UNSTAR) {
         await DB.query('Delete from collection where user_id = ? and comment_id = ?', [user, commentId])
@@ -27,7 +26,7 @@ module.exports = {
    * 获取用户的收藏影评列表
    */
   list: async ctx => {
-    let user = ctx.state.$wxInfo.userinfo.openId;
+    const user = ctx.state.$wxInfo.userinfo.openId;
     ctx.state.data = await DB.query('SELECT comment_movie.commentId, comment_movie.movieImage, comment_movie.movieTitle, comment_movie.userName, comment_movie.userAvatar, comment_movie.content, comment_movie.duration, comment_movie.type FROM collection LEFT JOIN ( SELECT comment.id as commentId, movie.image as movieImage, movie.title as movieTitle, comment.user_name as userName, comment.user_avatar as userAvatar, comment.content as content, comment.duration as duration, comment.type as type from comment LEFT JOIN movie ON comment.movie_id = movie.id ) AS comment_movie ON collection.comment_id = comment_movie.commentId WHERE collection.user_id = ?', [user])
   }
 }

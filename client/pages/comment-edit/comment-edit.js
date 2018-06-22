@@ -1,20 +1,10 @@
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js');
 const config = require('../../config.js');
+const constant = require('../../constant.js');
 const app = getApp();
 
 const recorderManager = wx.getRecorderManager()
 const innerAudioContext = wx.createInnerAudioContext()
-// 录音状态
-const UNRECORDED = 0
-const RECORDING = 1
-const RECORDED = 2
-// 播放状态
-const UNPLAYING = 0
-const PLAYING = 1
-// 录音授权状态
-const UNVERIFIED = 0 // 未验证
-const UNAUTHORIZED = 1 // 未授权
-const AUTHORIZED = 2 // 已授权
 
 Page({
   data: {
@@ -24,10 +14,10 @@ Page({
     commentContent: "", //文本内容，只有在影评内容是text时起效
     commentType: 'text', // 影评类型，默认为文本
     editMode: true, // 是否处于编辑状态
-    recordStatus: UNRECORDED, // 录音状态，默认处于未录音
+    recordStatus: constant.UNRECORDED, // 录音状态，默认处于未录音
     recordAudio: null, // 音频对象，只有在影评内容是voice时起效
-    audioStatus: UNPLAYING, // 音频播放状态
-    recordAuthStatus: UNVERIFIED // 录音授权状态
+    audioStatus: constant.UNPLAYING, // 音频播放状态
+    recordAuthStatus: constant.UNVERIFIED // 录音授权状态
   },
   /**
    * 监听页面加载事件
@@ -52,7 +42,7 @@ Page({
       success: userInfo => {
         this.setData({
           userInfo: userInfo,
-          recordStatus: UNRECORDED
+          recordStatus: constant.UNRECORDED
         })
         this.setAudioOptions()
       },
@@ -122,14 +112,14 @@ Page({
               success: () => {
                 // 已授权
                 this.setData({
-                  recordAuthStatus: AUTHORIZED
+                  recordAuthStatus: constant.AUTHORIZED
                 })
               },
               fail: error => {
                 console.log(error)
                 // 未授权
                 this.setData({
-                  recordAuthStatus: UNAUTHORIZED
+                  recordAuthStatus: constant.UNAUTHORIZED
                 })
               }
             })
@@ -137,12 +127,12 @@ Page({
         } else if (auth === false) {
           // 未授权
           this.setData({
-            recordAuthStatus: UNAUTHORIZED
+            recordAuthStatus: constant.UNAUTHORIZED
           })
         } else if (auth === true) {
           // 已授权
           this.setData({
-            recordAuthStatus: AUTHORIZED
+            recordAuthStatus: constant.AUTHORIZED
           })
         }
       },
@@ -156,9 +146,9 @@ Page({
    * 播放或暂停音频
    */
   onTapAudio() {
-    if (this.data.audioStatus === UNPLAYING) {
+    if (this.data.audioStatus === constant.UNPLAYING) {
       innerAudioContext.play()
-    } else if (this.data.audioStatus === PLAYING) {
+    } else if (this.data.audioStatus === constant.PLAYING) {
       innerAudioContext.pause()
     }
   },
@@ -168,22 +158,22 @@ Page({
   setAudioOptions() {
     innerAudioContext.onPlay(() => {
       this.setData({
-        audioStatus: PLAYING
+        audioStatus: constant.PLAYING
       })
     })
     innerAudioContext.onPause(() => {
       this.setData({
-        audioStatus: UNPLAYING
+        audioStatus: constant.UNPLAYING
       })
     })
     innerAudioContext.onStop(() => {
       this.setData({
-        audioStatus: UNPLAYING
+        audioStatus: constant.UNPLAYING
       })
     })
     innerAudioContext.onEnded(() => {
       this.setData({
-        audioStatus: UNPLAYING
+        audioStatus: constant.UNPLAYING
       })
     })
     innerAudioContext.onError(error => {
@@ -200,11 +190,11 @@ Page({
 
     if (auth === false) {
       this.setData({
-        recordAuthStatus: UNAUTHORIZED
+        recordAuthStatus: constant.UNAUTHORIZED
       })
     } else {
       this.setData({
-        recordAuthStatus: AUTHORIZED
+        recordAuthStatus: constant.AUTHORIZED
       })
     }
   },
@@ -223,14 +213,14 @@ Page({
       format: 'mp3',
       frameSize: 50
     }
-    if (this.data.recordAuthStatus === UNVERIFIED) {
+    if (this.data.recordAuthStatus === constant.UNVERIFIED) {
       this.getRecordAuth(true)
-    } else if (this.data.recordAuthStatus === AUTHORIZED) {
+    } else if (this.data.recordAuthStatus === constant.AUTHORIZED) {
       recorderManager.onStart(() => {
         wx.vibrateShort();
         innerAudioContext.stop()
         this.setData({
-          recordStatus: RECORDING,
+          recordStatus: constant.RECORDING,
           recordAudio: null
         })
       })
@@ -249,7 +239,7 @@ Page({
         res['durationText'] = Math.floor(res.duration / 1000 * 100) / 100 + "''"
         this.setData({
           recordAudio: res,
-          recordStatus: RECORDED
+          recordStatus: constant.RECORDED
         })
         innerAudioContext.src = res.tempFilePath
       })
